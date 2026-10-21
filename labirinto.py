@@ -281,6 +281,49 @@ def resolve_labirinto_a_star(matriz, inicio, fim):
     return []
 
 
+def celula_mais_distante(matriz, inicio):
+    """Retorna (posicao, distancia) da célula mais longe da entrada."""
+    if not matriz or not matriz[0]:
+        return inicio, 0
+
+    linhas = len(matriz)
+    colunas = len(matriz[0])
+    if not (0 <= inicio[0] < linhas and 0 <= inicio[1] < colunas):
+        return inicio, 0
+    if matriz[inicio[0]][inicio[1]] == 1:
+        return inicio, 0
+
+    fila = deque([(inicio, 0)])
+    visitados = {inicio}
+    posicao_mais_distante = inicio
+    distancia_maxima = 0
+
+    while fila:
+        posicao, distancia = fila.popleft()
+        if distancia > distancia_maxima:
+            posicao_mais_distante = posicao
+            distancia_maxima = distancia
+
+        linha, coluna = posicao
+        vizinhos = (
+            (linha - 1, coluna),
+            (linha + 1, coluna),
+            (linha, coluna - 1),
+            (linha, coluna + 1),
+        )
+        for vizinho in vizinhos:
+            if (
+                0 <= vizinho[0] < linhas
+                and 0 <= vizinho[1] < colunas
+                and matriz[vizinho[0]][vizinho[1]] == 0
+                and vizinho not in visitados
+            ):
+                visitados.add(vizinho)
+                fila.append((vizinho, distancia + 1))
+
+    return posicao_mais_distante, distancia_maxima
+
+
 if __name__ == "__main__":
     if __package__:
         from .exibir import abrir_interface
