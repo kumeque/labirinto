@@ -95,3 +95,46 @@ def test_bfs_devolve_o_mesmo_comprimento_do_a_star(semente):
 
     validar_caminho(matriz, caminho_bfs, inicio, fim)
     assert len(caminho_bfs) == len(caminho_a_star)
+
+
+# ---------------------------------------------------------------------------
+# TDD (transferencia): teste VERMELHO. Escreva celula_mais_distante.
+#
+# Truque de design de teste: nao sabemos qual celula e a mais distante,
+# entao NAO comparamos com um numero fixo. Usamos o proprio BFS como
+# ORACULO: medimos o caminho real ate a celula devolvida e conferimos
+# se a distancia declarada bate, e se nenhuma outra celula esta mais longe.
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("semente", range(3))
+def test_celula_mais_distante_esta_realmente_na_mais_longe(semente):
+    from labirinto import celula_mais_distante, resolve_labirinto_bfs
+
+    matriz = construir_labirinto(semente, linhas=9, colunas=15)
+    inicio = (0, 0)
+    linhas, colunas = len(matriz), len(matriz[0])
+
+    posicao, distancia = celula_mais_distante(matriz, inicio)
+
+    # 1. a celula devolvida existe e nao e parede
+    assert matriz[posicao[0]][posicao[1]] == 0
+
+    # 2. a distancia declarada bate com o caminho real ate essa celula
+    caminho = resolve_labirinto_bfs(matriz, inicio, posicao)
+    assert caminho, "a celula devolvida nem e alcancavel a partir da entrada"
+    assert len(caminho) - 1 == distancia, (
+        f"declarou distancia {distancia}, mas o caminho real tem {len(caminho) - 1} passos"
+    )
+
+    # 3. nenhuma outra celula livre esta mais longe
+    for linha in range(linhas):
+        for coluna in range(colunas):
+            if matriz[linha][coluna] != 0:
+                continue
+            outro = resolve_labirinto_bfs(matriz, inicio, (linha, coluna))
+            if not outro:
+                continue
+            real = len(outro) - 1
+            assert real <= distancia, (
+                f"a celula {(linha, coluna)} esta a {real} passos, "
+                f"mais longe que a devolvida ({distancia})"
+            )

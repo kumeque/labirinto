@@ -1,3 +1,4 @@
+from collections import deque
 import heapq
 
 if __package__:
@@ -109,6 +110,7 @@ def resolve_labirinto(matriz, inicio, fim):
             return valor
     return []
 
+
 def iterar_resolve_labirinto_bfs(matriz, inicio, fim):
     """
     Gera eventos enquanto resolve o labirinto usando busca em largura (BFS).
@@ -134,13 +136,13 @@ def iterar_resolve_labirinto_bfs(matriz, inicio, fim):
         yield "concluido", [inicio]
         return
 
-    fila = [inicio]
+    fila = deque([inicio])
     came_from = {inicio: None}
     visitados = set()
     visitados.add(inicio)
 
     while fila:
-        posicao_atual = fila.pop(0)
+        posicao_atual = fila.popleft()
         yield "explorando", posicao_atual
 
         if posicao_atual == fim:
@@ -175,12 +177,14 @@ def iterar_resolve_labirinto_bfs(matriz, inicio, fim):
 
     yield "concluido", []
 
+
 def resolve_labirinto_bfs(matriz, inicio, fim):
     """Resolve usando BFS e retorna a lista de posições do caminho."""
     for evento, valor in iterar_resolve_labirinto_bfs(matriz, inicio, fim):
         if evento == "concluido":
             return valor
     return []
+
 
 def iterar_resolve_labirinto_a_star(matriz, inicio, fim):
     """
