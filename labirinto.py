@@ -109,6 +109,78 @@ def resolve_labirinto(matriz, inicio, fim):
             return valor
     return []
 
+def iterar_resolve_labirinto_bfs(matriz, inicio, fim):
+    """
+    Gera eventos enquanto resolve o labirinto usando busca em largura (BFS).
+    """
+    if not matriz or not matriz[0]:
+        yield "concluido", []
+        return
+
+    linhas = len(matriz)
+    colunas = len(matriz[0])
+
+    if not (0 <= inicio[0] < linhas and 0 <= inicio[1] < colunas):
+        yield "concluido", []
+        return
+    if not (0 <= fim[0] < linhas and 0 <= fim[1] < colunas):
+        yield "concluido", []
+        return
+    if matriz[inicio[0]][inicio[1]] == 1 or matriz[fim[0]][fim[1]] == 1:
+        yield "concluido", []
+        return
+    if inicio == fim:
+        yield "caminho", inicio
+        yield "concluido", [inicio]
+        return
+
+    fila = [inicio]
+    came_from = {inicio: None}
+    visitados = set()
+    visitados.add(inicio)
+
+    while fila:
+        posicao_atual = fila.pop(0)
+        yield "explorando", posicao_atual
+
+        if posicao_atual == fim:
+            caminho = []
+            while posicao_atual is not None:
+                caminho.append(posicao_atual)
+                posicao_atual = came_from[posicao_atual]
+            caminho.reverse()
+            for posicao in caminho:
+                yield "caminho", posicao
+            yield "concluido", caminho
+            return
+
+        linha, coluna = posicao_atual
+        vizinhos = [
+            (linha - 1, coluna),
+            (linha + 1, coluna),
+            (linha, coluna - 1),
+            (linha, coluna + 1),
+        ]
+
+        for vizinho in vizinhos:
+            if (
+                0 <= vizinho[0] < linhas
+                and 0 <= vizinho[1] < colunas
+                and matriz[vizinho[0]][vizinho[1]] == 0
+                and vizinho not in visitados
+            ):
+                visitados.add(vizinho)
+                came_from[vizinho] = posicao_atual
+                fila.append(vizinho)
+
+    yield "concluido", []
+
+def resolve_labirinto_bfs(matriz, inicio, fim):
+    """Resolve usando BFS e retorna a lista de posições do caminho."""
+    for evento, valor in iterar_resolve_labirinto_bfs(matriz, inicio, fim):
+        if evento == "concluido":
+            return valor
+    return []
 
 def iterar_resolve_labirinto_a_star(matriz, inicio, fim):
     """
