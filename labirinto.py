@@ -323,6 +323,13 @@ def celula_mais_distante(matriz, inicio):
 
     return posicao_mais_distante, distancia_maxima
 
+# Registro dos algoritmos disponiveis na interface.
+# Para adicionar um novo: basta uma linha aqui.
+ALGORITMOS = {
+    "Backtracking": iterar_resolve_labirinto,
+    "BFS": iterar_resolve_labirinto_bfs,
+    "A*": iterar_resolve_labirinto_a_star,
+}
 
 if __name__ == "__main__":
     if __package__:
@@ -330,8 +337,4 @@ if __name__ == "__main__":
     else:
         from exibir import abrir_interface
 
-    abrir_interface(
-        gerar_labirinto_com_caminho,
-        iterar_resolve_labirinto,
-        iterar_resolve_labirinto_a_star,
-    )
+    abrir_interface(gerar_labirinto_com_caminho, ALGORITMOS)

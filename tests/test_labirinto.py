@@ -9,7 +9,11 @@ import random
 import pytest
 
 from gerar import gerar_labirinto_com_caminho
-from labirinto import resolve_labirinto, resolve_labirinto_a_star
+from labirinto import (
+    resolve_labirinto,
+    resolve_labirinto_a_star,
+    resolve_labirinto_bfs,
+)
 
 
 def construir_labirinto(semente, linhas=15, colunas=31):
@@ -138,3 +142,46 @@ def test_celula_mais_distante_esta_realmente_na_mais_longe(semente):
                 f"a celula {(linha, coluna)} esta a {real} passos, "
                 f"mais longe que a devolvida ({distancia})"
             )
+
+
+# ---------------------------------------------------------------------------
+# Caracterizacao: fixam o comportamento ATUAL nos casos de borda.
+# Escritos ANTES do refactor das validacoes, para provar que ele nao
+# muda nada. Se algum destes quebrar, o refactor quebrou o comportamento.
+# ---------------------------------------------------------------------------
+TODOS_OS_RESOLVEDORES = [
+    resolve_labirinto,
+    resolve_labirinto_bfs,
+    resolve_labirinto_a_star,
+]
+
+
+CASOS_INVALIDOS = [
+    ([], (0, 0), (0, 0)),
+    ([[1, 1], [1, 1]], (0, 0), (1, 1)),
+    ([[0, 0], [0, 0]], (5, 5), (1, 1)),
+    ([[0, 0], [0, 0]], (0, 0), (5, 5)),
+]
+
+
+@pytest.mark.parametrize("resolver", TODOS_OS_RESOLVEDORES)
+@pytest.mark.parametrize("matriz,inicio,fim", CASOS_INVALIDOS)
+def test_entrada_invalida_devolve_caminho_vazio(resolver, matriz, inicio, fim):
+    assert resolver(matriz, inicio, fim) == []
+
+
+@pytest.mark.parametrize("resolver", TODOS_OS_RESOLVEDORES)
+def test_inicio_igual_ao_fim_devolve_uma_celula(resolver):
+    matriz = [[0, 0], [0, 0]]
+    assert resolver(matriz, (0, 0), (0, 0)) == [(0, 0)]
+
+
+@pytest.mark.parametrize("matriz,inicio", [
+    ([], (0, 0)),
+    ([[1, 1], [1, 1]], (0, 0)),
+    ([[0, 0], [0, 0]], (5, 5)),
+])
+def test_celula_mais_distante_entrada_invalida(matriz, inicio):
+    from labirinto import celula_mais_distante
+
+    assert celula_mais_distante(matriz, inicio) == (inicio, 0)

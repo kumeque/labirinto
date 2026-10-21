@@ -15,11 +15,10 @@ class VisualizadorLabirinto:
         "grade": "#cbd3da",
     }
 
-    def __init__(self, janela, gerar_labirinto, resolver_backtracking, resolver_a_star):
+    def __init__(self, janela, gerar_labirinto, algoritmos):
+        self.algoritmos = algoritmos
         self.janela = janela
         self.gerar_labirinto = gerar_labirinto
-        self.resolver_backtracking = resolver_backtracking
-        self.resolver_a_star = resolver_a_star
         self.matriz = []
         self.inicio = (0, 0)
         self.fim = (0, 0)
@@ -38,7 +37,7 @@ class VisualizadorLabirinto:
         self.seletor_algoritmo = ttk.Combobox(
             controles,
             textvariable=self.algoritmo,
-            values=("Backtracking", "A*"),
+            values=tuple(algoritmos),
             state="readonly",
             width=16,
         )
@@ -194,10 +193,7 @@ class VisualizadorLabirinto:
 
     def iniciar(self):
         self._desenhar_labirinto()
-        if self.algoritmo.get() == "A*":
-            resolver = self.resolver_a_star
-        else:
-            resolver = self.resolver_backtracking
+        resolver = self.algoritmos[self.algoritmo.get()]
 
         self.eventos = iter(resolver(self.matriz, self.inicio, self.fim))
         self.botao_iniciar.configure(state=tk.DISABLED)
@@ -254,13 +250,13 @@ class VisualizadorLabirinto:
         self.janela.destroy()
 
 
-def abrir_interface(gerar_labirinto, resolver_backtracking, resolver_a_star):
+def abrir_interface(gerar_labirinto, algoritmos):
     janela = tk.Tk()
-    VisualizadorLabirinto(
-        janela, gerar_labirinto, resolver_backtracking, resolver_a_star
-    )
+    VisualizadorLabirinto(janela, gerar_labirinto, algoritmos)
     janela.mainloop()
 
+# Registro dos algoritmos disponiveis na interface.
+# Para adicionar um novo: basta uma linha aqui.
 
 if __name__ == "__main__":
     if __package__:
@@ -268,16 +264,14 @@ if __name__ == "__main__":
         from .labirinto import (
             iterar_resolve_labirinto,
             iterar_resolve_labirinto_a_star,
+            ALGORITMOS,
         )
     else:
         from gerar import gerar_labirinto_com_caminho
         from labirinto import (
             iterar_resolve_labirinto,
             iterar_resolve_labirinto_a_star,
+            ALGORITMOS,
         )
 
-    abrir_interface(
-        gerar_labirinto_com_caminho,
-        iterar_resolve_labirinto,
-        iterar_resolve_labirinto_a_star,
-    )
+    abrir_interface(gerar_labirinto_com_caminho, ALGORITMOS)
