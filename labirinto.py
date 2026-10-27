@@ -6,6 +6,28 @@ if __package__:
 else:
     from gerar import gerar_labirinto_com_caminho, gerar_labirinto_mais_desafiador
 
+def _dimensoes_validas(matriz, inicio, fim=None):
+    """
+    Valida a matriz e as posicoes.
+    Retorna (linhas, colunas) se estiver tudo certo, ou None se for invalido.
+    Se fim for None, valida apenas o inicio.
+    """
+    if not matriz or not matriz[0]:
+        return None
+
+    linhas = len(matriz)
+    colunas = len(matriz[0])
+
+    for posicao in (inicio, fim):
+        if posicao is None:
+            continue
+        if not (0 <= posicao[0] < linhas and 0 <= posicao[1] < colunas):
+            return None
+        if matriz[posicao[0]][posicao[1]] == 1:
+            return None
+
+    return linhas, colunas
+
 
 def iterar_resolve_labirinto(matriz, inicio, fim):
     """
@@ -18,23 +40,11 @@ def iterar_resolve_labirinto(matriz, inicio, fim):
     Usa uma pilha explícita em vez de recursão, então não estoura o limite
     de recursão do Python mesmo em labirintos grandes.
     """
-    if not matriz or not matriz[0]:
+    dimensoes = _dimensoes_validas(matriz, inicio, fim)
+    if dimensoes is None:
         yield "concluido", []
         return
-
-    linhas = len(matriz)
-    colunas = len(matriz[0])
-
-    if not (0 <= inicio[0] < linhas and 0 <= inicio[1] < colunas):
-        yield "concluido", []
-        return
-    if not (0 <= fim[0] < linhas and 0 <= fim[1] < colunas):
-        yield "concluido", []
-        return
-    if matriz[inicio[0]][inicio[1]] == 1 or matriz[fim[0]][fim[1]] == 1:
-        yield "concluido", []
-        return
-
+    linhas, colunas = dimensoes
     if inicio == fim:
         yield "caminho", inicio
         yield "concluido", [inicio]
@@ -115,26 +125,11 @@ def iterar_resolve_labirinto_bfs(matriz, inicio, fim):
     """
     Gera eventos enquanto resolve o labirinto usando busca em largura (BFS).
     """
-    if not matriz or not matriz[0]:
+    dimensoes = _dimensoes_validas(matriz, inicio, fim)
+    if dimensoes is None:
         yield "concluido", []
         return
-
-    linhas = len(matriz)
-    colunas = len(matriz[0])
-
-    if not (0 <= inicio[0] < linhas and 0 <= inicio[1] < colunas):
-        yield "concluido", []
-        return
-    if not (0 <= fim[0] < linhas and 0 <= fim[1] < colunas):
-        yield "concluido", []
-        return
-    if matriz[inicio[0]][inicio[1]] == 1 or matriz[fim[0]][fim[1]] == 1:
-        yield "concluido", []
-        return
-    if inicio == fim:
-        yield "caminho", inicio
-        yield "concluido", [inicio]
-        return
+    linhas, colunas = dimensoes
 
     fila = deque([inicio])
     came_from = {inicio: None}
@@ -190,26 +185,11 @@ def iterar_resolve_labirinto_a_star(matriz, inicio, fim):
     """
     Gera eventos enquanto resolve o labirinto usando o algoritmo A*.
     """
-    if not matriz or not matriz[0]:
+    dimensoes = _dimensoes_validas(matriz, inicio, fim)
+    if dimensoes is None:
         yield "concluido", []
         return
-
-    linhas = len(matriz)
-    colunas = len(matriz[0])
-
-    if not (0 <= inicio[0] < linhas and 0 <= inicio[1] < colunas):
-        yield "concluido", []
-        return
-    if not (0 <= fim[0] < linhas and 0 <= fim[1] < colunas):
-        yield "concluido", []
-        return
-    if matriz[inicio[0]][inicio[1]] == 1 or matriz[fim[0]][fim[1]] == 1:
-        yield "concluido", []
-        return
-    if inicio == fim:
-        yield "caminho", inicio
-        yield "concluido", [inicio]
-        return
+    linhas, colunas = dimensoes
 
     total_celulas = linhas * colunas
     inicio_indice = inicio[0] * colunas + inicio[1]
@@ -283,15 +263,10 @@ def resolve_labirinto_a_star(matriz, inicio, fim):
 
 def celula_mais_distante(matriz, inicio):
     """Retorna (posicao, distancia) da célula mais longe da entrada."""
-    if not matriz or not matriz[0]:
+    dimensoes = _dimensoes_validas(matriz, inicio)
+    if dimensoes is None:
         return inicio, 0
-
-    linhas = len(matriz)
-    colunas = len(matriz[0])
-    if not (0 <= inicio[0] < linhas and 0 <= inicio[1] < colunas):
-        return inicio, 0
-    if matriz[inicio[0]][inicio[1]] == 1:
-        return inicio, 0
+    linhas, colunas = dimensoes
 
     fila = deque([(inicio, 0)])
     visitados = {inicio}

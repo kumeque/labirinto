@@ -1,6 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
 
+if __package__:
+    from .labirinto import celula_mais_distante
+else:
+    from labirinto import celula_mais_distante
+
 
 class VisualizadorLabirinto:
     TAMANHO_CELULA = 22
