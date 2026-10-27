@@ -2,10 +2,9 @@ from collections import deque
 import heapq
 
 if __package__:
-    from .gerar import gerar_labirinto_com_caminho, gerar_labirinto_mais_desafiador
+    from .gerar import gerar_labirinto_com_caminho
 else:
-    from gerar import gerar_labirinto_com_caminho, gerar_labirinto_mais_desafiador
-
+    from gerar import gerar_labirinto_com_caminho
 def _dimensoes_validas(matriz, inicio, fim=None):
     """
     Valida a matriz e as posicoes.
@@ -45,6 +44,7 @@ def iterar_resolve_labirinto(matriz, inicio, fim):
         yield "concluido", []
         return
     linhas, colunas = dimensoes
+    
     if inicio == fim:
         yield "caminho", inicio
         yield "concluido", [inicio]

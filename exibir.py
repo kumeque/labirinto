@@ -1,11 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 
-if __package__:
-    from .labirinto import celula_mais_distante
-else:
-    from labirinto import celula_mais_distante
-
 
 class VisualizadorLabirinto:
     TAMANHO_CELULA = 22
@@ -260,22 +255,16 @@ def abrir_interface(gerar_labirinto, algoritmos):
     VisualizadorLabirinto(janela, gerar_labirinto, algoritmos)
     janela.mainloop()
 
-# Registro dos algoritmos disponiveis na interface.
-# Para adicionar um novo: basta uma linha aqui.
 
 if __name__ == "__main__":
     if __package__:
         from .gerar import gerar_labirinto_com_caminho
         from .labirinto import (
-            iterar_resolve_labirinto,
-            iterar_resolve_labirinto_a_star,
             ALGORITMOS,
         )
     else:
         from gerar import gerar_labirinto_com_caminho
         from labirinto import (
-            iterar_resolve_labirinto,
-            iterar_resolve_labirinto_a_star,
             ALGORITMOS,
         )
 
